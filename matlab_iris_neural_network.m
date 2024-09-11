@@ -2,7 +2,7 @@ clear;
 close all;
 clc;
 
-%Insertamos los datos de las plantas en forma de celda
+%Insert the plant data as a cell array
 data_raw = {5.1,3.5,1.4,0.2,'Iris-setosa';
             4.9,3.0,1.4,0.2,'Iris-setosa';
             4.7,3.2,1.3,0.2,'Iris-setosa';
@@ -155,83 +155,74 @@ data_raw = {5.1,3.5,1.4,0.2,'Iris-setosa';
             5.9,3.0,5.1,1.8,'Iris-virginica';
             };
 
-%Tomamos la informacion de las primeras 3 celdas, y la almacenamos en
-%X_data
-%Nos aseguramos de guardar los datos de forma numerica con la funcion cell2mat
+%Take the information from the first 3 cells and store it in X_data
+%Make sure to store the data as numeric using the cell2mat function
 X_Data = cell2mat(data_raw(:,1:3));
 
-% Almacenamos las etiquetas en Y_label
-Y_label = data_raw(:, 5);
+% Store the labels in Y_labels
+Y_labels = data_raw(:, 5);
 
-%Generamos un vector de 30 indices aleatorios que usaremos para seleccionar 30 muestras aleatorias
-indices_aleatorios = randperm(size(X_Data, 1), 30);
+%Generate a vector of 30 random indices that we will use to select 30 random samples
+random_indices = randperm(size(X_Data, 1), 30);
 
-%Seleccionamos 30 muestras aleatorias de la matriz original (X_Data)
-X_Data_Probe = X_Data(indices_aleatorios, :);
+%Use the random indices to select 30 random samples from the original matrix (X_Data)
+X_Test_Data = X_Data(random_indices, :);
 
-%Creamos una copia de los datos originales
-X_Data_Training = X_Data;
+%Create a copy of the original data into X_Training_Data
+X_Training_Data = X_Data;
 
-%Eliminamos de esta copia las muestras que seleccionamos anteriormente (X_Data_Probe)
-X_Data_Training(indices_aleatorios, :) = [];
+%Get rid of the 30 selected random samples (X_Test_Data) within the X_Training_Data
+X_Training_Data(random_indices, :) = [];
 
-%X_Data_Probe y X_Data_Training son ahora dos matrices que contienen 30 y 120 muestras respectivamente, en donde X_Data_Training seran los datos de entrenamiento y X_Data_Probe los datos de prueba
+%X_Test_Data and X_Training_Data are now two matrices that contain 30 and 120 samples respectively, where X_Training_Data will be the training data and X_Test_Data the test data
 
-%Hacemos exactamente lo mismo con las etiquetas para tener Y_label_Probe y Y_label_Training
-Y_label_Probe = Y_label(indices_aleatorios, :);
-Y_label_Training = Y_label;
-Y_label_Training(indices_aleatorios,:) = [];
+%Do the same exact thing with the labels to have Y_Test_Labels and Y_Training_Labels
+Y_Test_Labels = Y_labels(random_indices, :);
+Y_Training_Labels = Y_labels;
+Y_Training_Labels(random_indices,:) = [];
 
-%Usaremos el metodo de la distancia euclidiana para encontrar el vecino mas cercano
-%Para ello, tomamos un punto nuevo, y calculamos la distancia de este punto a todos los puntos de entrenamiento
-%El punto nuevo sera el primer dato de prueba
-punto_nuevo = X_Data_Probe(1, :);
+%We're going to use the euclidean distance method to find the nearest neighbor
+%To do this, we take a new point, and calculate the distance from this point to all training points
+%The new point will be the first in the test data matrix
+selected_test_point = X_Test_Data(1, :);
 
-%Calculamos la distancia de este punto a todos los puntos de entrenamiento
-distancia_minima = realmax;
-index_distancia_min = 0;
+%Calculate the distance from this test point to all training points
+minimum_distance = realmax;
+minimum_distance_index = 0;
 
-for i = 1:1:size(X_Data_Training, 1)
-    dista = sqrt((X_Data_Training(i,1) - punto_nuevo(1,1))^2 ...
-                + (X_Data_Training(i,2) - punto_nuevo(1,2))^2 ...
-                + (X_Data_Training(i,3) - punto_nuevo(1,3))^2);
-    if dista < distancia_minima
-        distancia_minima = dista;
-        index_distancia_min = i;
+%Iterate through all training points
+for i = 1:1:size(X_Training_Data, 1)
+    actual_distance = sqrt((X_Training_Data(i,1) - selected_test_point(1,1))^2 ...
+                + (X_Training_Data(i,2) - selected_test_point(1,2))^2 ...
+                + (X_Training_Data(i,3) - selected_test_point(1,3))^2);
+    if actual_distance < minimum_distance
+        minimum_distance = actual_distance;
+        minimum_distance_index = i;
     end
 end
 
-%Obtenemos la prediccion de la etiqueta de la planta
-prediccion = string(Y_label_Training(index_distancia_min));
+%Get the prediction of the plant type
+prediction = string(Y_Training_Labels(minimum_distance_index));
 
-%Graficamos los datos
-% figure;
-% for i = 1:size(tipos_de_plantas, 2)
-%     X = X_Data_Training(1 + (50*(i-1)) : 50*i, 1);
-%     Y = X_Data_Training(1 + (50*(i-1)) : 50*i, 2);
-%     Z = X_Data_Training(1 + (50*(i-1)) : 50*i, 3);
-%     plot3(X, Y, Z, '--o', 'MarkerSize', 10);
-%     hold on;
-% end
-
-%Graficamos los datos
+%Generate a 3D plot of the training data and the selected test point
 figure;
-for i = 1:size(Y_label_Training, 1)
-    if strcmp(Y_label_Training(i), 'Iris-setosa')
-        setosa = plot3(X_Data_Training(i, 1), X_Data_Training(i, 2), X_Data_Training(i, 3), 'ro', 'color', 'green', 'MarkerSize', 10);
-    elseif strcmp(Y_label_Training(i), 'Iris-versicolor')
-        versicolor = plot3(X_Data_Training(i, 1), X_Data_Training(i, 2), X_Data_Training(i, 3), 'go', 'color', 'black','MarkerSize', 10);
+for i = 1:size(Y_Training_Labels, 1)
+    if strcmp(Y_Training_Labels(i), 'Iris-setosa')
+        setosa = plot3(X_Training_Data(i, 1), X_Training_Data(i, 2), X_Training_Data(i, 3), 'ro', 'color', 'green', 'MarkerSize', 10);
+    elseif strcmp(Y_Training_Labels(i), 'Iris-versicolor')
+        versicolor = plot3(X_Training_Data(i, 1), X_Training_Data(i, 2), X_Training_Data(i, 3), 'go', 'color', 'black','MarkerSize', 10);
     else
-        virginica = plot3(X_Data_Training(i, 1), X_Data_Training(i, 2), X_Data_Training(i, 3), 'bo', 'color', 'red', 'MarkerSize', 10);
+        virginica = plot3(X_Training_Data(i, 1), X_Training_Data(i, 2), X_Training_Data(i, 3), 'bo', 'color', 'red', 'MarkerSize', 10);
     end
     hold on;
 end
 
-%Graficamos el punto nuevo
-prediccionPlot = plot3(punto_nuevo(1,1), punto_nuevo(1,2), punto_nuevo(1,3), 'x', 'MarkerSize', 15, 'LineWidth', 3);
-title('Visualización tridimensional de tipos de plantas por color');
-legend([setosa, versicolor, virginica, prediccionPlot], 'Setosa', 'Versicolor', 'Virginica', prediccion);
+%The selected test point will be plotted as a big 'x'
+predictionPlot = plot3(selected_test_point(1,1), selected_test_point(1,2), selected_test_point(1,3), 'x', 'MarkerSize', 15, 'LineWidth', 3);
+title('3D Visualization of Plant Types by Color');
+legend([setosa, versicolor, virginica, predictionPlot], 'Setosa', 'Versicolor', 'Virginica', prediction);
 grid on;
 
-%Imprimimos la prediccion
-fprintf('La prediccion de la planta es: %s\n', prediccion);
+%Show the prediction
+fprintf('The prediction of the plant type is: %s\n', prediction);
+fprintf('The actual plant type is: %s\n', string(Y_Test_Labels(1)));
