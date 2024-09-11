@@ -17,15 +17,16 @@ Each sample in the dataset contains the following features:
 
 ## 🧠 Program Overview
 
-1. **Data Insertion**: The program begins by inserting the raw data of the Iris plants into a cell array.
+1. **Data Insertion**: The program begins by inserting the raw data of the Iris plants into a cell array `data_raw`.
 2. **Data Preparation**: 
-   - The first three columns of the cell array (features) are converted to a numeric matrix `X_Data`.
-   - The fifth column (species labels) is stored in `Y_label`.
+   - The first three columns of the cell array (features) are converted to a numeric matrix `X_Training_Data`.
+   - The fifth column (species labels) is stored in `Y_Training_Labels`.
 3. **Data Splitting**:
-   - 30 random samples are selected for testing (`X_Data_Probe` and `Y_label_Probe`).
-   - The remaining 120 samples are used for training (`X_Data_Training` and `Y_label_Training`).
+   - 30 random samples are selected for testing (`X_Test_Data` and `Y_Test_Labels`).
+   - The remaining 120 samples are used for training (`X_Training_Data` and `Y_Training_Labels`).
 4. **Neural Network Training**: The training data is used to train a neural network.
 5. **Prediction**: The trained neural network is used to predict the species of the test samples.
+6. **Visualization**: The program generates a 3D plot of the training data and the selected test point, with different colors representing different species.
 
 ## 🎓 Educational Purpose
 
